@@ -77,8 +77,31 @@ class NativeDrawCanvasView(
         fingerDrawingEnabled = { viewModel.uiState.value.fingerDrawingEnabled },
     )
 
-    override fun onTouchEvent(event: MotionEvent): Boolean =
-        touchHandler.handleEvent(event)
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        val handled = touchHandler.handleEvent(event)
+        handleStandardStylusButtons(event)
+        return handled
+    }
+
+    // ── Standard stylus barrel buttons (BTN_STYLUS / BTN_STYLUS2) ──
+    // Works with any stylus that reports MotionEvent button state, not only Xiaomi's pen.
+    private var lastStylusButtonState = 0
+
+    private fun handleStandardStylusButtons(event: MotionEvent) {
+        if (viewModel.uiState.value.stylusButtonScheme == StylusButtonScheme.Disabled) {
+            lastStylusButtonState = event.buttonState
+            return
+        }
+        val current = event.buttonState
+        val pressed = current and lastStylusButtonState.inv()
+        if (pressed and MotionEvent.BUTTON_STYLUS_PRIMARY != 0) {
+            viewModel.performStylusButtonAction(viewModel.uiState.value.stylusPrimaryButtonAction)
+        }
+        if (pressed and MotionEvent.BUTTON_STYLUS_SECONDARY != 0) {
+            viewModel.performStylusButtonAction(viewModel.uiState.value.stylusSecondaryButtonAction)
+        }
+        lastStylusButtonState = current
+    }
 
     // ── Hover (stylus/mouse size preview) ──────────────────────
 
@@ -265,3 +288,4 @@ class NativeDrawCanvasView(
     }
 
 }
+
