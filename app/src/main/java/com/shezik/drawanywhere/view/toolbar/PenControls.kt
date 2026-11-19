@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import com.shezik.drawanywhere.R
 import com.shezik.drawanywhere.model.PenConfig
 import com.shezik.drawanywhere.ui.theme.Spacing
-import top.yukonga.miuix.kmp.basic.Slider
 
 @Composable
 fun PenControls(
@@ -66,7 +65,7 @@ fun SliderControl(
         }
         Spacer(modifier = Modifier.height(Spacing.xs))
         Slider(
-            modifier = Modifier.height(18.dp),
+            modifier = Modifier.fillMaxWidth(),
             value = value,
             onValueChange = onValueChange,
             valueRange = valueRange,

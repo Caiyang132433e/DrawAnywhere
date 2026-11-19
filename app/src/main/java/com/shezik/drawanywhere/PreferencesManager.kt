@@ -33,6 +33,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 
@@ -64,6 +65,7 @@ class PreferencesManager(private val context: Context) {
         val SAVED_ERASER_SIZES = stringPreferencesKey("saved_eraser_sizes")
         val EXPORT_TREE_URI = stringPreferencesKey("export_tree_uri")
         val STYLUS_CYCLE_COLORS = stringPreferencesKey("stylus_cycle_colors")
+        val FIRST_LAYER_BUTTONS = stringSetPreferencesKey("first_layer_buttons")
 
         // Pen-specific keys (for saving multiple pens)
         fun penColorKey(penType: PenType) = intPreferencesKey("${penType.name}_color")
@@ -149,6 +151,8 @@ class PreferencesManager(private val context: Context) {
         val savedLaserWidths = decodeFloatList(preferences[PreferencesKeys.SAVED_LASER_WIDTHS])
         val savedEraserSizes = decodeFloatList(preferences[PreferencesKeys.SAVED_ERASER_SIZES])
         val exportTreeUri = preferences[PreferencesKeys.EXPORT_TREE_URI]
+        val firstLayerButtons = preferences[PreferencesKeys.FIRST_LAYER_BUTTONS]
+            ?: defaultUiState.firstDrawerButtons
         val stylusCycleColors = decodeColorList(preferences[PreferencesKeys.STYLUS_CYCLE_COLORS])
             .ifEmpty { defaultUiState.stylusCycleColors }
 
@@ -180,6 +184,7 @@ class PreferencesManager(private val context: Context) {
             savedEraserSizes = savedEraserSizes,
             exportTreeUri = exportTreeUri,
             stylusCycleColors = stylusCycleColors,
+            firstDrawerButtons = firstLayerButtons,
             canvasVisible = visibleOnStart,
             firstDrawerOpen = visibleOnStart
         )
@@ -209,6 +214,7 @@ class PreferencesManager(private val context: Context) {
                 preferences[PreferencesKeys.EXPORT_TREE_URI] = it
             } ?: preferences.remove(PreferencesKeys.EXPORT_TREE_URI)
             preferences[PreferencesKeys.STYLUS_CYCLE_COLORS] = encodeColorList(uiState.stylusCycleColors)
+            preferences[PreferencesKeys.FIRST_LAYER_BUTTONS] = uiState.firstDrawerButtons
 
             // Save each pen's configuration
             for ((penType, config) in uiState.penConfigs) {
@@ -264,3 +270,4 @@ class PreferencesManager(private val context: Context) {
     private fun encodeFloatList(values: List<Float>): String =
         values.joinToString(",") { it.toString() }
 }
+

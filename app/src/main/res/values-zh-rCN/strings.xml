@@ -51,6 +51,8 @@
     <string name="undo">撤销</string>
     <string name="clear_canvas">清空画布</string>
     <string name="tool_controls">工具选项</string>
+    <string name="toolbar_button_visibility">显示/隐藏画布</string>
+    <string name="toolbar_button_passthrough">触控穿透</string>
     <string name="color_picker">取色器</string>
     <string name="recent">最近</string>
     <string name="hsv">HSV</string>
@@ -88,6 +90,8 @@
     <string name="settings_overview">把控制板、画布和手写笔行为集中到一页里整理。</string>
     <string name="settings_toolbar_section">控制板与画布</string>
     <string name="settings_toolbar_desc">统一设置笔盒停靠方向，以及画布启动和隐藏时的行为。</string>
+    <string name="settings_toolbar_buttons">工具条按钮</string>
+    <string name="settings_toolbar_buttons_desc">选择哪些按钮留在第一层，其余收进可展开的第二层；工具条长度会自动调整。</string>
     <string name="settings_drawing_section">绘制输入</string>
     <string name="settings_drawing_desc">决定哪些输入方式可以直接绘制。</string>
     <string name="settings_stylus_desc">把手写笔按键方案、按键动作和压力擦除放在一起调整。</string>

@@ -82,7 +82,7 @@ data class UiState(
     val secondDrawerOpen: Boolean = false,
 
     val firstDrawerButtons: Set<String> = setOf(
-        "undo", "clear", "tool_controls", "color_picker", "zoom_lock"
+        "visibility", "undo", "clear", "tool_controls", "color_picker"
     ),
     val secondDrawerButtons: Set<String> = setOf(
         "passthrough", "redo", "minimize", "settings"
@@ -410,6 +410,13 @@ class DrawViewModel(
 
     fun setFirstDrawerOpen(state: Boolean) =
         _uiState.update { it.copy(firstDrawerOpen = state) }
+
+    /** Adds or removes a button from the always-visible first layer. */
+    fun setFirstLayerButton(id: String, visible: Boolean) =
+        _uiState.update { state ->
+            val next = if (visible) state.firstDrawerButtons + id else state.firstDrawerButtons - id
+            state.copy(firstDrawerButtons = next)
+        }
 
     fun toggleSecondDrawer() =
         setSecondDrawerOpen(!uiState.value.secondDrawerOpen)

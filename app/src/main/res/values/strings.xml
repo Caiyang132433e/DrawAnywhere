@@ -50,6 +50,8 @@
     <string name="undo">Undo</string>
     <string name="clear_canvas">Clear canvas</string>
     <string name="tool_controls">Tool controls</string>
+    <string name="toolbar_button_visibility">Show / hide canvas</string>
+    <string name="toolbar_button_passthrough">Touch passthrough</string>
     <string name="color_picker">Color picker</string>
     <string name="recent">Recent</string>
     <string name="hsv">HSV</string>
@@ -87,6 +89,8 @@
     <string name="settings_overview">Keep overlay, canvas, and stylus behavior in one tidy place.</string>
     <string name="settings_toolbar_section">Toolbar &amp; canvas</string>
     <string name="settings_toolbar_desc">Choose how the floating pen case docks and how the canvas behaves on launch and hide.</string>
+    <string name="settings_toolbar_buttons">Toolbar buttons</string>
+    <string name="settings_toolbar_buttons_desc">Pick which buttons stay on the first layer. Everything else moves into the expandable second layer; the toolbar grows or shrinks automatically.</string>
     <string name="settings_drawing_section">Drawing input</string>
     <string name="settings_drawing_desc">Decide which input sources are allowed to draw directly.</string>
     <string name="settings_stylus_desc">Set the stylus button scheme, button actions, and pressure erase behavior together.</string>
