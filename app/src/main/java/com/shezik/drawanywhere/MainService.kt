@@ -19,6 +19,7 @@ package com.shezik.drawanywhere
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.app.Activity
 import android.app.Dialog
@@ -91,6 +92,8 @@ class MainService : Service() {
             "com.shezik.drawanywhere.action.SCREEN_CAPTURE_PERMISSION_RESULT"
         const val ACTION_SAVE_LOCATION_RESULT =
             "com.shezik.drawanywhere.action.SAVE_LOCATION_RESULT"
+        const val ACTION_QUIT =
+            "com.shezik.drawanywhere.action.QUIT"
         const val EXTRA_SCREEN_CAPTURE_RESULT_CODE = "screen_capture_result_code"
         const val EXTRA_SCREEN_CAPTURE_DATA = "screen_capture_data"
         const val EXTRA_SAVE_LOCATION_URI = "save_location_uri"
@@ -270,6 +273,11 @@ class MainService : Service() {
         when (intent?.action) {
             ACTION_SCREEN_CAPTURE_PERMISSION_RESULT -> handleScreenCapturePermissionResult(intent)
             ACTION_SAVE_LOCATION_RESULT -> handleSaveLocationResult(intent)
+            ACTION_QUIT -> {
+                viewModel.quitApplication(savePosition = true)
+                stopSelf()
+                return START_NOT_STICKY
+            }
         }
         return START_STICKY
     }
@@ -286,8 +294,10 @@ class MainService : Service() {
     private fun applyToolbarPosition(params: LayoutParams, state: ServiceState) {
         val rounded = state.toolbarPosition.round()
         val (screenWidth, screenHeight) = getUsableScreenSize(windowManager)
-        params.x = rounded.x.coerceIn(0, screenWidth - toolbarView.width)
-        params.y = rounded.y.coerceIn(0, screenHeight - toolbarView.height)
+        val maxX = (screenWidth - toolbarView.width).coerceAtLeast(0)
+        val maxY = (screenHeight - toolbarView.height).coerceAtLeast(0)
+        params.x = rounded.x.coerceIn(0, maxX)
+        params.y = rounded.y.coerceIn(0, maxY)
         val clamped = Offset(params.x.toFloat(), params.y.toFloat())
         if (clamped != state.toolbarPosition) {
             viewModel.setToolbarPosition(clamped)
@@ -798,5 +808,15 @@ class MainService : Service() {
             .setSmallIcon(android.R.drawable.ic_menu_edit)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
+            .addAction(
+                0,
+                getString(R.string.quit),
+                PendingIntent.getService(
+                    this,
+                    1,
+                    Intent(this, MainService::class.java).setAction(ACTION_QUIT),
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            )
             .build()
 }

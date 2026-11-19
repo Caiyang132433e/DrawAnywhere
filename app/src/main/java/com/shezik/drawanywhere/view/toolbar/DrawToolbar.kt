@@ -19,11 +19,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -224,11 +227,23 @@ fun DrawToolbar(
                                     .onSizeChanged { expandedWidthPx = it.width }
                                     .padding(horizontal = 8.dp, vertical = 6.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
                                 MainToolColumn(uiState = uiState, onSelectMainTool = selectMainTool)
                                 HorizontalSeparator()
-                                detail(true)
+                                // The detail area (color grid + width presets) is the tallest
+                                // part of the vertical toolbar. Cap it and let it scroll so the
+                                // drag handle and the action row (including Close) always stay
+                                // inside the screen. On a 1800x2880 tablet the whole toolbar
+                                // previously exceeded the usable height and the bottom actions
+                                // were clipped by the overlay window.
+                                Box(
+                                    modifier = Modifier
+                                        .heightIn(max = 280.dp)
+                                        .verticalScroll(rememberScrollState()),
+                                ) {
+                                    detail(true)
+                                }
                                 DragCollapseHandle(
                                     haptics = haptics,
                                     onPositionChange = viewModel::updateToolbarPosition,
@@ -467,9 +482,26 @@ private fun ToolbarActionSegment(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (vertical) {
-                primaryActions()
-                HorizontalSeparator()
-                secondaryActions()
+                // Two compact columns instead of one tall column: on the tablet the
+                // seven action buttons alone were ~256dp tall, which pushed the
+                // toolbar past the bottom of the screen (and hid Close).
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(3.dp),
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(3.dp),
+                    ) {
+                        primaryActions()
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(3.dp),
+                    ) {
+                        secondaryActions()
+                    }
+                }
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     primaryActions()
