@@ -133,10 +133,20 @@ fun DrawToolbar(
                                 exit = fadeOut() + scaleOut(targetScale = 0.92f),
                             ) {
                                 if (isVertical) {
+                                    // A vertical 8-button drawer would run past the bottom of
+                                    // the screen. Lay the second layer out in two columns so it
+                                    // stays compact and every button remains reachable.
                                     Column(verticalArrangement = spacing) {
-                                        secondLayerIds.forEach { id ->
-                                            allButtons[id]?.let { button ->
-                                                RenderButton(button = button, popupAlignment = popupAlignment)
+                                        secondLayerIds.chunked(2).forEach { rowIds ->
+                                            Row(horizontalArrangement = spacing) {
+                                                rowIds.forEach { id ->
+                                                    allButtons[id]?.let { button ->
+                                                        RenderButton(
+                                                            button = button,
+                                                            popupAlignment = popupAlignment
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
                                     }
