@@ -8,12 +8,10 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -100,9 +98,9 @@ fun DrawToolbar(
     val spacing = if (isVertical) Arrangement.spacedBy(4.dp) else Arrangement.spacedBy(4.dp)
 
     DrawAnywhereTheme {
-        BoxWithConstraints {
+        Box {
             DraggableToolbarSurface(
-                modifier = modifier.widthIn(max = maxWidth),
+                modifier = modifier,
                 haptics = haptics,
                 onPositionChange = viewModel::updateToolbarPosition,
                 onPositionSaved = viewModel::saveToolbarPosition,
@@ -256,3 +254,4 @@ private fun DraggableToolbarSurface(
         content()
     }
 }
+
