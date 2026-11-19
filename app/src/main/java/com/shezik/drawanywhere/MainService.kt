@@ -64,6 +64,7 @@ import com.shezik.drawanywhere.view.DismissTargetView
 import com.shezik.drawanywhere.view.ToolbarLifecycleOwner
 import com.shezik.drawanywhere.view.canvas.NativeDrawCanvasView
 import com.shezik.drawanywhere.view.toolbar.DrawToolbar
+import com.shezik.drawanywhere.view.toolbar.ToolbarContainer
 import com.shezik.drawanywhere.view.toolbar.FloatingSettingsWindow
 import com.shezik.drawanywhere.model.StylusButtonScheme
 import com.shezik.drawanywhere.view.toolbar.ToolbarOrientation
@@ -112,7 +113,7 @@ class MainService : Service() {
     private lateinit var drawController: DrawController
     private lateinit var windowManager: WindowManager
     private lateinit var canvasView: NativeDrawCanvasView
-    private lateinit var toolbarView: ComposeView
+    private lateinit var toolbarView: ToolbarContainer
     private var settingsView: ComposeView? = null
     private var settingsDialog: Dialog? = null
     private lateinit var dismissTargetView: DismissTargetView
@@ -162,9 +163,8 @@ class MainService : Service() {
 
         // -------- Setup toolbar (Compose) --------
         toolbarLifecycleOwner.start()
-        toolbarView = ComposeView(this).apply {
-            setBackgroundColor(AndroidColor.TRANSPARENT)
-            setContent {
+        toolbarView = ToolbarContainer(this).apply {
+            composeView.setContent {
                 val canRedo by viewModel.canRedo.collectAsState()
                 val uiState by viewModel.uiState.collectAsState()
                 DrawToolbar(
@@ -331,6 +331,13 @@ class MainService : Service() {
 
     private fun updateToolbarWindowLayout(params: LayoutParams) {
         if (::toolbarView.isInitialized && toolbarView.isAttachedToWindow) {
+            // Pin the overlay window to the measured content size. Otherwise the window
+            // keeps its old WRAP_CONTENT size while the second layer expands, clipping
+            // the rightmost buttons (the old "half circle" bug).
+            if (toolbarView.measuredWidth > 0) {
+                params.width = toolbarView.measuredWidth
+                params.height = toolbarView.measuredHeight
+            }
             windowManager.updateViewLayout(toolbarView, params)
         }
     }
