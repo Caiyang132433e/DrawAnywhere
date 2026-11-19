@@ -344,15 +344,14 @@ class MainService : Service() {
         attributes = params
         setLayout(params.width, params.height)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            setBackgroundBlurRadius(dpToPx(36f))
+            setBackgroundBlurRadius(0)
         }
     }
 
     private fun settingsWindowBackground(): GradientDrawable =
         GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
-            cornerRadius = dpToPx(24f).toFloat()
-            setColor(AndroidColor.argb(72, 245, 247, 250))
+            setColor(AndroidColor.TRANSPARENT)
         }
 
     private fun initializeToolbarPositionIfNeeded(params: LayoutParams) {

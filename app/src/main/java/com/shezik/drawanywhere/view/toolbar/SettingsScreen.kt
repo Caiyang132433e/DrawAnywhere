@@ -269,7 +269,7 @@ fun FloatingSettingsWindow(
     val windowHeight = minOf(configuration.screenHeightDp.dp * 0.88f, 900.dp)
 
     Box(
-        modifier = modifier,
+        modifier = modifier.padding(12.dp),
         contentAlignment = Alignment.Center,
     ) {
         Surface(
