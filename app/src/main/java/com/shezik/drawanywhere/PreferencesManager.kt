@@ -50,6 +50,7 @@ class PreferencesManager(private val context: Context) {
         val AUTO_CLEAR_CANVAS = booleanPreferencesKey("auto_clear_canvas")
         val VISIBLE_ON_START = booleanPreferencesKey("visible_on_start")
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
+        val TOOLBAR_LAYOUT_V2 = booleanPreferencesKey("toolbar_layout_v2")
         val TOOLBAR_MINIMIZED = booleanPreferencesKey("toolbar_minimized")
         val FINGER_DRAWING_ENABLED = booleanPreferencesKey("finger_drawing_enabled")
         val STYLUS_BUTTON_CAPTURE_ENABLED = booleanPreferencesKey("stylus_button_capture_enabled")
@@ -152,8 +153,13 @@ class PreferencesManager(private val context: Context) {
         val savedLaserWidths = decodeFloatList(preferences[PreferencesKeys.SAVED_LASER_WIDTHS])
         val savedEraserSizes = decodeFloatList(preferences[PreferencesKeys.SAVED_ERASER_SIZES])
         val exportTreeUri = preferences[PreferencesKeys.EXPORT_TREE_URI]
-        val firstLayerButtons = preferences[PreferencesKeys.FIRST_LAYER_BUTTONS]
-            ?: defaultUiState.firstDrawerButtons
+        val toolbarLayoutV2 = preferences[PreferencesKeys.TOOLBAR_LAYOUT_V2] ?: false
+        val firstLayerButtons = if (!toolbarLayoutV2) {
+            // One-time migration to the README-style five-button first layer.
+            defaultUiState.firstDrawerButtons
+        } else {
+            preferences[PreferencesKeys.FIRST_LAYER_BUTTONS] ?: defaultUiState.firstDrawerButtons
+        }
         val stylusCycleColors = decodeColorList(preferences[PreferencesKeys.STYLUS_CYCLE_COLORS])
             .ifEmpty { defaultUiState.stylusCycleColors }
 
@@ -218,6 +224,7 @@ class PreferencesManager(private val context: Context) {
             } ?: preferences.remove(PreferencesKeys.EXPORT_TREE_URI)
             preferences[PreferencesKeys.STYLUS_CYCLE_COLORS] = encodeColorList(uiState.stylusCycleColors)
             preferences[PreferencesKeys.FIRST_LAYER_BUTTONS] = uiState.firstDrawerButtons
+            preferences[PreferencesKeys.TOOLBAR_LAYOUT_V2] = true
 
             // Save each pen's configuration
             for ((penType, config) in uiState.penConfigs) {
