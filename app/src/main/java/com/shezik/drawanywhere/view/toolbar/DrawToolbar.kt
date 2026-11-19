@@ -30,9 +30,11 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.remember
 import com.shezik.drawanywhere.DrawViewModel
+import com.shezik.drawanywhere.R
 import com.shezik.drawanywhere.ui.theme.DrawAnywhereTheme
 
 /**
@@ -220,7 +222,7 @@ private fun CollapsedToolbar(
             IconButton(onClick = onExpand) {
                 Icon(
                     imageVector = uiState.currentPenType.icon,
-                    contentDescription = "Expand toolbar",
+                    contentDescription = stringResource(R.string.expand_toolbar),
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }

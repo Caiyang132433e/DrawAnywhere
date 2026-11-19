@@ -93,6 +93,11 @@
     <string name="settings_overview">把控制板、画布和手写笔行为集中到一页里整理。</string>
     <string name="settings_toolbar_section">控制板与画布</string>
     <string name="settings_toolbar_desc">统一设置笔盒停靠方向，以及画布启动和隐藏时的行为。</string>
+    <string name="settings_theme_section">主题</string>
+    <string name="theme_primary">主色</string>
+    <string name="theme_secondary">次色</string>
+    <string name="theme_tertiary">第三色</string>
+    <string name="theme_surface">容器底色</string>
     <string name="monet_color">莫奈取色</string>
     <string name="monet_color_desc">Android 12+ 跟随壁纸取主题色（Material You）。</string>
     <string name="settings_toolbar_buttons">工具条按钮</string>

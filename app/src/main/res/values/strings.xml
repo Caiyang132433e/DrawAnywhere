@@ -92,6 +92,11 @@
     <string name="settings_overview">Keep overlay, canvas, and stylus behavior in one tidy place.</string>
     <string name="settings_toolbar_section">Toolbar &amp; canvas</string>
     <string name="settings_toolbar_desc">Choose how the floating pen case docks and how the canvas behaves on launch and hide.</string>
+    <string name="settings_theme_section">Theme</string>
+    <string name="theme_primary">Primary</string>
+    <string name="theme_secondary">Secondary</string>
+    <string name="theme_tertiary">Tertiary</string>
+    <string name="theme_surface">Surface container</string>
     <string name="monet_color">Monet colors</string>
     <string name="monet_color_desc">Use wallpaper-based Material You colors on Android 12+.</string>
     <string name="settings_toolbar_buttons">Toolbar buttons</string>

@@ -69,6 +69,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.shezik.drawanywhere.BuildConfig
 import com.shezik.drawanywhere.DrawViewModel
@@ -147,6 +148,16 @@ fun SettingsScreen(
                         onCheckedChange = viewModel::setAutoClearCanvas,
                     )
                     HorizontalDivider()
+                    SaveLocationRow(
+                        exportTreeUri = uiState.exportTreeUri,
+                        onChooseSaveLocation = onChooseSaveLocation,
+                        onReset = viewModel::resetExportLocation,
+                    )
+                }
+            }
+
+            item {
+                SettingsSection(title = stringResource(R.string.settings_theme_section)) {
                     SettingsSwitchRow(
                         title = stringResource(R.string.monet_color),
                         subtitle = stringResource(R.string.monet_color_desc),
@@ -154,11 +165,7 @@ fun SettingsScreen(
                         onCheckedChange = viewModel::setDynamicColor,
                     )
                     HorizontalDivider()
-                    SaveLocationRow(
-                        exportTreeUri = uiState.exportTreeUri,
-                        onChooseSaveLocation = onChooseSaveLocation,
-                        onReset = viewModel::resetExportLocation,
-                    )
+                    ThemeColorPreview()
                 }
             }
 
@@ -289,6 +296,63 @@ fun FloatingSettingsWindow(
                 modifier = Modifier.fillMaxSize(),
             )
         }
+    }
+}
+
+@Composable
+private fun ThemeColorPreview() {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        ThemeColorSwatch(
+            label = stringResource(R.string.theme_primary),
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.weight(1f),
+        )
+        ThemeColorSwatch(
+            label = stringResource(R.string.theme_secondary),
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.weight(1f),
+        )
+        ThemeColorSwatch(
+            label = stringResource(R.string.theme_tertiary),
+            color = MaterialTheme.colorScheme.tertiary,
+            modifier = Modifier.weight(1f),
+        )
+        ThemeColorSwatch(
+            label = stringResource(R.string.theme_surface),
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+@Composable
+private fun ThemeColorSwatch(
+    label: String,
+    color: Color,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(color)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
