@@ -94,6 +94,17 @@
     <string name="settings_toolbar_section">Toolbar &amp; canvas</string>
     <string name="settings_toolbar_desc">Choose how the floating pen case docks and how the canvas behaves on launch and hide.</string>
     <string name="settings_theme_section">Theme</string>
+    <string name="theme_mode">Theme mode</string>
+    <string name="theme_mode_system">System</string>
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+    <string name="theme_accent">Accent color</string>
+    <string name="accent_blue">Blue</string>
+    <string name="accent_teal">Teal</string>
+    <string name="accent_purple">Purple</string>
+    <string name="accent_green">Green</string>
+    <string name="accent_orange">Orange</string>
+    <string name="accent_rose">Rose</string>
     <string name="theme_primary">Primary</string>
     <string name="theme_secondary">Secondary</string>
     <string name="theme_tertiary">Tertiary</string>

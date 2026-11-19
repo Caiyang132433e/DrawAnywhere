@@ -34,7 +34,11 @@ class SettingsActivity : ComponentActivity() {
             ComposeView(this).apply {
                 setContent {
                     val uiState by viewModel.uiState.collectAsState()
-                    DrawAnywhereTheme(dynamicColor = uiState.dynamicColor) {
+                    DrawAnywhereTheme(
+                        themeMode = uiState.themeMode,
+                        dynamicColor = uiState.dynamicColor,
+                        accent = uiState.themeAccent,
+                    ) {
                         SettingsScreen(
                             viewModel = viewModel,
                             onChooseSaveLocation = {

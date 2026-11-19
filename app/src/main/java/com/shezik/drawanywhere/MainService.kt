@@ -379,7 +379,11 @@ class MainService : Service() {
         val view = ComposeView(this).apply {
             setContent {
                 val settingsUiState by viewModel.uiState.collectAsState()
-                DrawAnywhereTheme(dynamicColor = settingsUiState.dynamicColor) {
+                DrawAnywhereTheme(
+                    themeMode = settingsUiState.themeMode,
+                    dynamicColor = settingsUiState.dynamicColor,
+                    accent = settingsUiState.themeAccent,
+                ) {
                     FloatingSettingsWindow(
                         viewModel = viewModel,
                         onChooseSaveLocation = ::requestSaveLocation,

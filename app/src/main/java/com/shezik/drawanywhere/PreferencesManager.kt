@@ -51,6 +51,8 @@ class PreferencesManager(private val context: Context) {
         val VISIBLE_ON_START = booleanPreferencesKey("visible_on_start")
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
         val TOOLBAR_LAYOUT_V2 = booleanPreferencesKey("toolbar_layout_v2")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
+        val THEME_ACCENT = stringPreferencesKey("theme_accent")
         val TOOLBAR_MINIMIZED = booleanPreferencesKey("toolbar_minimized")
         val FINGER_DRAWING_ENABLED = booleanPreferencesKey("finger_drawing_enabled")
         val STYLUS_BUTTON_CAPTURE_ENABLED = booleanPreferencesKey("stylus_button_capture_enabled")
@@ -177,6 +179,8 @@ class PreferencesManager(private val context: Context) {
 
             visibleOnStart = visibleOnStart,
             dynamicColor = preferences[PreferencesKeys.DYNAMIC_COLOR] ?: defaultUiState.dynamicColor,
+            themeMode = getEnumValueOrDefault(preferences[PreferencesKeys.THEME_MODE], defaultUiState.themeMode),
+            themeAccent = getEnumValueOrDefault(preferences[PreferencesKeys.THEME_ACCENT], defaultUiState.themeAccent),
             toolbarMinimized = toolbarMinimized,
             fingerDrawingEnabled = fingerDrawingEnabled,
             stylusButtonScheme = stylusButtonScheme,
@@ -206,6 +210,8 @@ class PreferencesManager(private val context: Context) {
             preferences[PreferencesKeys.AUTO_CLEAR_CANVAS] = uiState.autoClearCanvas
             preferences[PreferencesKeys.VISIBLE_ON_START] = uiState.visibleOnStart
             preferences[PreferencesKeys.DYNAMIC_COLOR] = uiState.dynamicColor
+            preferences[PreferencesKeys.THEME_MODE] = uiState.themeMode.name
+            preferences[PreferencesKeys.THEME_ACCENT] = uiState.themeAccent.name
             preferences[PreferencesKeys.TOOLBAR_MINIMIZED] = uiState.toolbarMinimized
             preferences[PreferencesKeys.FINGER_DRAWING_ENABLED] = uiState.fingerDrawingEnabled
             preferences[PreferencesKeys.STYLUS_BUTTON_SCHEME] = uiState.stylusButtonScheme.name

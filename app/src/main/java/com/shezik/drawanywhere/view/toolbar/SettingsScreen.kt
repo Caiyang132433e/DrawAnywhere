@@ -58,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -77,6 +78,8 @@ import com.shezik.drawanywhere.R
 import com.shezik.drawanywhere.model.PRESET_COLORS
 import com.shezik.drawanywhere.model.StylusButtonAction
 import com.shezik.drawanywhere.model.StylusButtonScheme
+import com.shezik.drawanywhere.ui.theme.ThemeAccent
+import com.shezik.drawanywhere.ui.theme.ThemeMode
 
 private val pressureThresholdOptions = listOf(0.65f, 0.75f, 0.85f, 0.95f)
 
@@ -158,11 +161,24 @@ fun SettingsScreen(
 
             item {
                 SettingsSection(title = stringResource(R.string.settings_theme_section)) {
+                    SettingsSegmentedRow(
+                        title = stringResource(R.string.theme_mode),
+                        options = ThemeMode.entries.map { stringResource(it.labelRes) },
+                        selectedIndex = ThemeMode.entries.indexOf(uiState.themeMode).coerceAtLeast(0),
+                        onSelected = { index -> viewModel.setThemeMode(ThemeMode.entries[index]) },
+                    )
+                    HorizontalDivider()
                     SettingsSwitchRow(
                         title = stringResource(R.string.monet_color),
                         subtitle = stringResource(R.string.monet_color_desc),
                         checked = uiState.dynamicColor,
                         onCheckedChange = viewModel::setDynamicColor,
+                    )
+                    HorizontalDivider()
+                    AccentColorRow(
+                        selected = uiState.themeAccent,
+                        enabled = !uiState.dynamicColor,
+                        onSelected = viewModel::setThemeAccent,
                     )
                     HorizontalDivider()
                     ThemeColorPreview()
@@ -295,6 +311,53 @@ fun FloatingSettingsWindow(
                 onChooseSaveLocation = onChooseSaveLocation,
                 modifier = Modifier.fillMaxSize(),
             )
+        }
+    }
+}
+
+@Composable
+private fun AccentColorRow(
+    selected: ThemeAccent,
+    enabled: Boolean,
+    onSelected: (ThemeAccent) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        ThemeAccent.entries.forEach { accent ->
+            val isSelected = accent == selected
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .alpha(if (enabled) 1f else 0.4f)
+                    .clickable(enabled = enabled) { onSelected(accent) },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clip(CircleShape)
+                        .background(accent.preview)
+                        .border(
+                            width = if (isSelected) 3.dp else 1.dp,
+                            color = if (isSelected) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.outlineVariant
+                            },
+                            shape = CircleShape,
+                        ),
+                )
+                Text(
+                    text = stringResource(accent.labelRes),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

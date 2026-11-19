@@ -95,6 +95,17 @@
     <string name="settings_toolbar_section">控制板与画布</string>
     <string name="settings_toolbar_desc">统一设置笔盒停靠方向，以及画布启动和隐藏时的行为。</string>
     <string name="settings_theme_section">主题</string>
+    <string name="theme_mode">主题模式</string>
+    <string name="theme_mode_system">跟随系统</string>
+    <string name="theme_mode_light">浅色</string>
+    <string name="theme_mode_dark">深色</string>
+    <string name="theme_accent">主题色</string>
+    <string name="accent_blue">蓝</string>
+    <string name="accent_teal">青</string>
+    <string name="accent_purple">紫</string>
+    <string name="accent_green">绿</string>
+    <string name="accent_orange">橙</string>
+    <string name="accent_rose">玫红</string>
     <string name="theme_primary">主色</string>
     <string name="theme_secondary">次色</string>
     <string name="theme_tertiary">第三色</string>

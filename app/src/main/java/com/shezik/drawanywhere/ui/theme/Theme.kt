@@ -75,10 +75,17 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun DrawAnywhereTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     dynamicColor: Boolean = false,
+    accent: ThemeAccent = ThemeAccent.BLUE,
     content: @Composable () -> Unit
 ) {
+    val darkTheme = when (themeMode) {
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
+    val baseScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -88,8 +95,7 @@ fun DrawAnywhereTheme(
                 androidx.compose.material3.dynamicLightColorScheme(context)
             }
         }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        else -> baseScheme.withAccent(accent, darkTheme)
     }
     val context = LocalContext.current
     val activity = context as? ComponentActivity

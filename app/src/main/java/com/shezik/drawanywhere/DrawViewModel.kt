@@ -29,6 +29,8 @@ import com.shezik.drawanywhere.model.StylusButtonAction
 import com.shezik.drawanywhere.model.StylusButtonScheme
 import com.shezik.drawanywhere.model.StrokeSample
 import com.shezik.drawanywhere.view.canvas.CanvasViewport
+import com.shezik.drawanywhere.ui.theme.ThemeAccent
+import com.shezik.drawanywhere.ui.theme.ThemeMode
 import com.shezik.drawanywhere.view.canvas.LockMode
 import com.shezik.drawanywhere.view.toolbar.ToolbarOrientation
 import com.shezik.drawanywhere.view.toolbar.ToolbarOrientationMode
@@ -58,6 +60,8 @@ data class UiState(
     val autoClearCanvas: Boolean = false,
     val visibleOnStart: Boolean = true,
     val dynamicColor: Boolean = true,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val themeAccent: ThemeAccent = ThemeAccent.BLUE,
     val toolbarMinimized: Boolean = false,
     val fingerDrawingEnabled: Boolean = true,
     val stylusButtonScheme: StylusButtonScheme = StylusButtonScheme.XiaomiSmartPen,
@@ -451,6 +455,12 @@ class DrawViewModel(
 
     fun setDynamicColor(state: Boolean) =
         _uiState.update { it.copy(dynamicColor = state) }
+
+    fun setThemeMode(mode: ThemeMode) =
+        _uiState.update { it.copy(themeMode = mode) }
+
+    fun setThemeAccent(accent: ThemeAccent) =
+        _uiState.update { it.copy(themeAccent = accent) }
 
     fun setToolbarMinimized(state: Boolean) =
         _uiState.update { it.copy(toolbarMinimized = state) }
