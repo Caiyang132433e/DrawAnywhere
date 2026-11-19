@@ -24,6 +24,7 @@
     <string name="canvas_visible_on_start">Open canvas on start</string>
     <string name="canvas_visible_on_start_desc">Restore the drawing canvas automatically when the service starts.</string>
     <string name="minimize_toolbar">Minimize toolbar</string>
+    <string name="move_toolbar">Move toolbar</string>
     <string name="restore_toolbar">Restore toolbar</string>
     <string name="finger_drawing">Finger drawing</string>
     <string name="finger_drawing_desc">When off, only stylus input can draw on the canvas.</string>

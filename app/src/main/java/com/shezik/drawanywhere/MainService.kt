@@ -337,8 +337,9 @@ class MainService : Service() {
 
     private fun Window.applySettingsWindowAttributes(params: LayoutParams) {
         setBackgroundDrawable(settingsWindowBackground())
-        clearFlags(LayoutParams.FLAG_DIM_BEHIND or LayoutParams.FLAG_BLUR_BEHIND)
-        setDimAmount(0f)
+        clearFlags(LayoutParams.FLAG_BLUR_BEHIND)
+        addFlags(LayoutParams.FLAG_DIM_BEHIND)
+        setDimAmount(0.32f)
         setType(LayoutParams.TYPE_APPLICATION_OVERLAY)
         decorView.setPadding(0, 0, 0, 0)
         attributes = params

@@ -1,10 +1,13 @@
 package com.shezik.drawanywhere.view.toolbar
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -122,9 +126,19 @@ fun DrawToolbar(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = spacing,
                         ) {
-                            firstLayerIds.forEach { id ->
-                                allButtons[id]?.let { button ->
-                                    RenderButton(button = button, popupAlignment = popupAlignment)
+                            ToolbarDragHandle(
+                                haptics = haptics,
+                                onPositionChange = viewModel::updateToolbarPosition,
+                                onPositionSaved = viewModel::saveToolbarPosition,
+                            )
+                            // Vertical: fixed two-column grid for both layers.
+                            firstLayerIds.chunked(2).forEach { rowIds ->
+                                Row(horizontalArrangement = spacing) {
+                                    rowIds.forEach { id ->
+                                        allButtons[id]?.let { button ->
+                                            RenderButton(button = button, popupAlignment = popupAlignment)
+                                        }
+                                    }
                                 }
                             }
                             if (hasSecondLayer) {
@@ -136,12 +150,9 @@ fun DrawToolbar(
                                 )
                                 AnimatedVisibility(
                                     visible = uiState.secondDrawerOpen,
-                                    enter = fadeIn() + scaleIn(initialScale = 0.92f),
-                                    exit = fadeOut() + scaleOut(targetScale = 0.92f),
+                                    enter = expandVertically(expandFrom = Alignment.Top) + fadeIn(),
+                                    exit = shrinkVertically(shrinkTowards = Alignment.Top) + fadeOut(),
                                 ) {
-                                    // A vertical 8-button drawer would run past the bottom of
-                                    // the screen. Lay the second layer out in two columns so it
-                                    // stays compact and every button remains reachable.
                                     Column(verticalArrangement = spacing) {
                                         secondLayerIds.chunked(2).forEach { rowIds ->
                                             Row(horizontalArrangement = spacing) {
@@ -160,38 +171,41 @@ fun DrawToolbar(
                             }
                         }
                     } else {
-                        // Horizontal: keep the first layer in one compact row and show the
-                        // second layer as a second row underneath. Inline growth would run
-                        // past the right edge of the screen when the toolbar is docked there.
-                        Column(
+                        // Horizontal: one continuous bar. The second layer expands
+                        // horizontally inside the same row, and MainService keeps the
+                        // whole bar on screen by shifting its position while it grows.
+                        Row(
                             modifier = Modifier.padding(8.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = spacing,
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = spacing,
                         ) {
-                            Row(horizontalArrangement = spacing) {
-                                firstLayerIds.forEach { id ->
-                                    allButtons[id]?.let { button ->
-                                        RenderButton(button = button, popupAlignment = popupAlignment)
-                                    }
-                                }
-                                if (hasSecondLayer) {
-                                    ToolbarExpandButton(
-                                        modifier = Modifier,
-                                        isExpanded = uiState.secondDrawerOpen,
-                                        onClick = viewModel::toggleSecondDrawer,
-                                        orientation = uiState.toolbarOrientation,
-                                    )
+                            ToolbarDragHandle(
+                                haptics = haptics,
+                                onPositionChange = viewModel::updateToolbarPosition,
+                                onPositionSaved = viewModel::saveToolbarPosition,
+                            )
+                            firstLayerIds.forEach { id ->
+                                allButtons[id]?.let { button ->
+                                    RenderButton(button = button, popupAlignment = popupAlignment)
                                 }
                             }
-                            AnimatedVisibility(
-                                visible = uiState.secondDrawerOpen,
-                                enter = fadeIn() + scaleIn(initialScale = 0.92f),
-                                exit = fadeOut() + scaleOut(targetScale = 0.92f),
-                            ) {
-                                Row(horizontalArrangement = spacing) {
-                                    secondLayerIds.forEach { id ->
-                                        allButtons[id]?.let { button ->
-                                            RenderButton(button = button, popupAlignment = popupAlignment)
+                            if (hasSecondLayer) {
+                                ToolbarExpandButton(
+                                    modifier = Modifier,
+                                    isExpanded = uiState.secondDrawerOpen,
+                                    onClick = viewModel::toggleSecondDrawer,
+                                    orientation = uiState.toolbarOrientation,
+                                )
+                                AnimatedVisibility(
+                                    visible = uiState.secondDrawerOpen,
+                                    enter = expandHorizontally(expandFrom = Alignment.Start) + fadeIn(),
+                                    exit = shrinkHorizontally(shrinkTowards = Alignment.Start) + fadeOut(),
+                                ) {
+                                    Row(horizontalArrangement = spacing) {
+                                        secondLayerIds.forEach { id ->
+                                            allButtons[id]?.let { button ->
+                                                RenderButton(button = button, popupAlignment = popupAlignment)
+                                            }
                                         }
                                     }
                                 }
@@ -201,6 +215,39 @@ fun DrawToolbar(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ToolbarDragHandle(
+    haptics: HapticFeedback,
+    onPositionChange: (Offset) -> Unit,
+    onPositionSaved: () -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDragStart = {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        onPositionChange(dragAmount)
+                    },
+                    onDragEnd = { onPositionSaved() },
+                    onDragCancel = { onPositionSaved() },
+                )
+            },
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            imageVector = Icons.Default.DragHandle,
+            contentDescription = stringResource(R.string.move_toolbar),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp),
+        )
     }
 }
 

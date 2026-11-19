@@ -276,7 +276,7 @@ fun FloatingSettingsWindow(
     val windowHeight = minOf(configuration.screenHeightDp.dp * 0.88f, 900.dp)
 
     Box(
-        modifier = modifier.padding(12.dp),
+        modifier = modifier.padding(24.dp),
         contentAlignment = Alignment.Center,
     ) {
         Surface(
@@ -287,7 +287,7 @@ fun FloatingSettingsWindow(
             shape = RoundedCornerShape(28.dp),
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 6.dp,
-            shadowElevation = 12.dp,
+            shadowElevation = 24.dp,
         ) {
             SettingsScreen(
                 viewModel = viewModel,

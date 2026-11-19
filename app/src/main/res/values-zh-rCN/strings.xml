@@ -25,6 +25,7 @@
     <string name="canvas_visible_on_start">启动时显示画布</string>
     <string name="canvas_visible_on_start_desc">服务启动后自动恢复画布显示。</string>
     <string name="minimize_toolbar">最小化工具栏</string>
+    <string name="move_toolbar">移动工具栏</string>
     <string name="restore_toolbar">恢复工具栏</string>
     <string name="finger_drawing">手指绘制</string>
     <string name="finger_drawing_desc">关闭后仅允许手写笔在画布上落笔。</string>
