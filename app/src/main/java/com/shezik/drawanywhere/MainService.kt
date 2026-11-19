@@ -309,10 +309,10 @@ class MainService : Service() {
         val maxY = (screenHeight - toolbarView.height - margin).coerceAtLeast(margin)
         params.x = rounded.x.coerceIn(margin, maxX)
         params.y = rounded.y.coerceIn(margin, maxY)
-        val clamped = Offset(params.x.toFloat(), params.y.toFloat())
-        if (clamped != state.toolbarPosition) {
-            viewModel.setToolbarPosition(clamped)
-        }
+        // Do not write the transient clamp back into the saved position. During the
+        // expand animation the toolbar is temporarily shifted to stay on screen; keeping
+        // the user's intended position lets it return naturally when it collapses and
+        // avoids a state emission (and extra relayout) on every animation frame.
     }
 
     private fun updateToolbarAlpha() {
