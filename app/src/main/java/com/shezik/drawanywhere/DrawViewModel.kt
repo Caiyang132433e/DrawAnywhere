@@ -418,6 +418,10 @@ class DrawViewModel(
             state.copy(firstDrawerButtons = next)
         }
 
+    /** Restores the README-style default: visibility, undo, clear, tool, color. */
+    fun resetFirstLayerButtons() =
+        _uiState.update { it.copy(firstDrawerButtons = UiState().firstDrawerButtons) }
+
     fun toggleSecondDrawer() =
         setSecondDrawerOpen(!uiState.value.secondDrawerOpen)
 

@@ -167,6 +167,7 @@ fun SettingsScreen(
                     ToolbarButtonsSettings(
                         uiState = uiState,
                         onToggle = viewModel::setFirstLayerButton,
+                        onReset = viewModel::resetFirstLayerButtons,
                     )
                 }
             }
@@ -478,6 +479,7 @@ private fun SaveLocationRow(
 private fun ToolbarButtonsSettings(
     uiState: com.shezik.drawanywhere.UiState,
     onToggle: (String, Boolean) -> Unit,
+    onReset: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         toolbarButtonCatalog.forEachIndexed { index, meta ->
@@ -490,6 +492,13 @@ private fun ToolbarButtonsSettings(
             if (index != toolbarButtonCatalog.lastIndex) {
                 HorizontalDivider(modifier = Modifier.padding(start = 52.dp))
             }
+        }
+        HorizontalDivider()
+        TextButton(
+            onClick = onReset,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+        ) {
+            Text(stringResource(R.string.restore_default))
         }
     }
 }

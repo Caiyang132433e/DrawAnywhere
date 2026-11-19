@@ -112,25 +112,29 @@ fun DrawToolbar(
                         onExpand = { viewModel.setToolbarMinimized(false) },
                     )
                 } else {
-                    val content: @Composable () -> Unit = {
-                        firstLayerIds.forEach { id ->
-                            allButtons[id]?.let { button ->
-                                RenderButton(button = button, popupAlignment = popupAlignment)
+                    if (isVertical) {
+                        Column(
+                            modifier = Modifier.padding(6.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = spacing,
+                        ) {
+                            firstLayerIds.forEach { id ->
+                                allButtons[id]?.let { button ->
+                                    RenderButton(button = button, popupAlignment = popupAlignment)
+                                }
                             }
-                        }
-                        if (hasSecondLayer) {
-                            ToolbarExpandButton(
-                                modifier = Modifier,
-                                isExpanded = uiState.secondDrawerOpen,
-                                onClick = viewModel::toggleSecondDrawer,
-                                orientation = uiState.toolbarOrientation,
-                            )
-                            AnimatedVisibility(
-                                visible = uiState.secondDrawerOpen,
-                                enter = fadeIn() + scaleIn(initialScale = 0.92f),
-                                exit = fadeOut() + scaleOut(targetScale = 0.92f),
-                            ) {
-                                if (isVertical) {
+                            if (hasSecondLayer) {
+                                ToolbarExpandButton(
+                                    modifier = Modifier,
+                                    isExpanded = uiState.secondDrawerOpen,
+                                    onClick = viewModel::toggleSecondDrawer,
+                                    orientation = uiState.toolbarOrientation,
+                                )
+                                AnimatedVisibility(
+                                    visible = uiState.secondDrawerOpen,
+                                    enter = fadeIn() + scaleIn(initialScale = 0.92f),
+                                    exit = fadeOut() + scaleOut(targetScale = 0.92f),
+                                ) {
                                     // A vertical 8-button drawer would run past the bottom of
                                     // the screen. Lay the second layer out in two columns so it
                                     // stays compact and every button remains reachable.
@@ -148,34 +152,46 @@ fun DrawToolbar(
                                             }
                                         }
                                     }
-                                } else {
-                                    Row(horizontalArrangement = spacing) {
-                                        secondLayerIds.forEach { id ->
-                                            allButtons[id]?.let { button ->
-                                                RenderButton(button = button, popupAlignment = popupAlignment)
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
-                    }
-
-                    if (isVertical) {
+                    } else {
+                        // Horizontal: keep the first layer in one compact row and show the
+                        // second layer as a second row underneath. Inline growth would run
+                        // past the right edge of the screen when the toolbar is docked there.
                         Column(
                             modifier = Modifier.padding(6.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = spacing,
                         ) {
-                            content()
-                        }
-                    } else {
-                        Row(
-                            modifier = Modifier.padding(6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = spacing,
-                        ) {
-                            content()
+                            Row(horizontalArrangement = spacing) {
+                                firstLayerIds.forEach { id ->
+                                    allButtons[id]?.let { button ->
+                                        RenderButton(button = button, popupAlignment = popupAlignment)
+                                    }
+                                }
+                                if (hasSecondLayer) {
+                                    ToolbarExpandButton(
+                                        modifier = Modifier,
+                                        isExpanded = uiState.secondDrawerOpen,
+                                        onClick = viewModel::toggleSecondDrawer,
+                                        orientation = uiState.toolbarOrientation,
+                                    )
+                                }
+                            }
+                            AnimatedVisibility(
+                                visible = uiState.secondDrawerOpen,
+                                enter = fadeIn() + scaleIn(initialScale = 0.92f),
+                                exit = fadeOut() + scaleOut(targetScale = 0.92f),
+                            ) {
+                                Row(horizontalArrangement = spacing) {
+                                    secondLayerIds.forEach { id ->
+                                        allButtons[id]?.let { button ->
+                                            RenderButton(button = button, popupAlignment = popupAlignment)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
