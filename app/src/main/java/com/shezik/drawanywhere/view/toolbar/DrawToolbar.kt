@@ -1,6 +1,10 @@
 package com.shezik.drawanywhere.view.toolbar
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -25,11 +29,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -103,8 +111,28 @@ fun DrawToolbar(
     val popupAlignment = if (isVertical) Alignment.CenterEnd else Alignment.TopCenter
     val spacing = if (isVertical) Arrangement.spacedBy(4.dp) else Arrangement.spacedBy(4.dp)
 
+    // One-shot entrance animation when the floating toolbar is first composed.
+    var entered by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { entered = true }
+    val enterScale by animateFloatAsState(
+        targetValue = if (entered) 1f else 0.88f,
+        animationSpec = spring(dampingRatio = 0.72f, stiffness = 420f),
+        label = "toolbar_enter_scale",
+    )
+    val enterAlpha by animateFloatAsState(
+        targetValue = if (entered) 1f else 0f,
+        animationSpec = tween(durationMillis = 180, easing = FastOutSlowInEasing),
+        label = "toolbar_enter_alpha",
+    )
+
     DrawAnywhereTheme(dynamicColor = uiState.dynamicColor) {
-        Box {
+        Box(
+            modifier = Modifier.graphicsLayer {
+                scaleX = enterScale
+                scaleY = enterScale
+                alpha = enterAlpha
+            },
+        ) {
             DraggableToolbarSurface(
                 // Leave room inside the overlay window for the Material surface shadow
                 // and rounded corner anti-aliasing; otherwise WindowManager crops them.
