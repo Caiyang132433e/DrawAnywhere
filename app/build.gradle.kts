@@ -21,8 +21,8 @@ android {
         applicationId = "com.shezik.drawanywhere"
         minSdk = 33
         targetSdk = 36
-        versionCode = 5
-        versionName = "2.3-hpos-stylus"
+        versionCode = 6
+        versionName = "2.3-md3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -126,3 +126,4 @@ tasks.whenTaskAdded {
         enabled = false
     }
 }
+
