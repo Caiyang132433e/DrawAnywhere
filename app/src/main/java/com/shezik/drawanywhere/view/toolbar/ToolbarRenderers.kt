@@ -48,15 +48,15 @@ internal fun ToolbarExpandButton(
         onClick = onClick,
         modifier = modifier
             .background(
-                color = if (isExpanded) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                color = if (isExpanded) MaterialTheme.colorScheme.secondaryContainer
+                else MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = CircleShape
             )
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
             contentDescription = if (isExpanded) stringResource(R.string.collapse_toolbar) else stringResource(R.string.expand_toolbar),
-            tint = if (isExpanded) MaterialTheme.colorScheme.onPrimaryContainer
+            tint = if (isExpanded) MaterialTheme.colorScheme.onSecondaryContainer
             else MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.graphicsLayer { rotationZ = rotationAngle }
         )
@@ -76,7 +76,7 @@ internal fun AnimatedToolbarButton(modifier: Modifier, button: ToolbarButton) {
         enabled = button.isEnabled,
         modifier = modifier
             .graphicsLayer { scaleX = scale; scaleY = scale }
-            .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f), shape = CircleShape)
+            .background(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = CircleShape)
     ) {
         button.iconContent?.invoke()
             ?: Icon(
@@ -99,8 +99,8 @@ internal fun PopupToolbarButton(
             onClick = { isPopupOpen = !isPopupOpen },
             enabled = button.isEnabled,
             modifier = Modifier.background(
-                color = if (isPopupOpen) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surface.copy(alpha = 0.7f),
+                color = if (isPopupOpen) MaterialTheme.colorScheme.secondaryContainer
+                else MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = CircleShape
             )
         ) {
@@ -108,7 +108,7 @@ internal fun PopupToolbarButton(
                 ?: Icon(
                     imageVector = button.icon,
                     contentDescription = button.contentDescription,
-                    tint = if (isPopupOpen) button.color ?: MaterialTheme.colorScheme.onPrimaryContainer
+                    tint = if (isPopupOpen) button.color ?: MaterialTheme.colorScheme.onSecondaryContainer
                     else if (button.isEnabled) button.color ?: MaterialTheme.colorScheme.onSurface
                     else (button.color ?: MaterialTheme.colorScheme.onSurface).copy(alpha = 0.4f)
                 )

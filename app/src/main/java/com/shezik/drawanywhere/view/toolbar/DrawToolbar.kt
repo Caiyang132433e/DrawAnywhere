@@ -116,7 +116,7 @@ fun DrawToolbar(
                 } else {
                     if (isVertical) {
                         Column(
-                            modifier = Modifier.padding(6.dp),
+                            modifier = Modifier.padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = spacing,
                         ) {
@@ -162,7 +162,7 @@ fun DrawToolbar(
                         // second layer as a second row underneath. Inline growth would run
                         // past the right edge of the screen when the toolbar is docked there.
                         Column(
-                            modifier = Modifier.padding(6.dp),
+                            modifier = Modifier.padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = spacing,
                         ) {
@@ -264,7 +264,7 @@ private fun DraggableToolbarSurface(
             )
         },
         shape = RoundedCornerShape(28.dp),
-        color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.96f),
+        color = MaterialTheme.colorScheme.surfaceContainer,
         contentColor = MaterialTheme.colorScheme.onSurface,
         tonalElevation = 3.dp,
         shadowElevation = 6.dp,

@@ -66,6 +66,7 @@ import com.shezik.drawanywhere.view.canvas.NativeDrawCanvasView
 import com.shezik.drawanywhere.view.toolbar.DrawToolbar
 import com.shezik.drawanywhere.view.toolbar.FloatingSettingsWindow
 import com.shezik.drawanywhere.model.StylusButtonScheme
+import com.shezik.drawanywhere.view.toolbar.ToolbarOrientation
 import com.shezik.drawanywhere.ui.theme.DrawAnywhereTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -298,8 +299,12 @@ class MainService : Service() {
     private fun applyToolbarPosition(params: LayoutParams, state: ServiceState) {
         val rounded = state.toolbarPosition.round()
         val (screenWidth, screenHeight) = getUsableScreenSize(windowManager)
-        // M3 floating toolbar guidance: keep at least 16dp from the window edges.
-        val margin = dpToPx(16f)
+        // M3 floating toolbar guidance: 16dp for horizontal, 24dp for vertical.
+        val margin = if (viewModel.uiState.value.toolbarOrientation == ToolbarOrientation.VERTICAL) {
+            dpToPx(24f)
+        } else {
+            dpToPx(16f)
+        }
         val maxX = (screenWidth - toolbarView.width - margin).coerceAtLeast(margin)
         val maxY = (screenHeight - toolbarView.height - margin).coerceAtLeast(margin)
         params.x = rounded.x.coerceIn(margin, maxX)
