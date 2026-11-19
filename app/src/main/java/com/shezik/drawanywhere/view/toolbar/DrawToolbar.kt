@@ -97,10 +97,12 @@ fun DrawToolbar(
     val popupAlignment = if (isVertical) Alignment.CenterEnd else Alignment.TopCenter
     val spacing = if (isVertical) Arrangement.spacedBy(4.dp) else Arrangement.spacedBy(4.dp)
 
-    DrawAnywhereTheme {
+    DrawAnywhereTheme(dynamicColor = uiState.dynamicColor) {
         Box {
             DraggableToolbarSurface(
-                modifier = modifier,
+                // Leave room inside the overlay window for the Material surface shadow
+                // and rounded corner anti-aliasing; otherwise WindowManager crops them.
+                modifier = modifier.padding(8.dp),
                 haptics = haptics,
                 onPositionChange = viewModel::updateToolbarPosition,
                 onPositionSaved = viewModel::saveToolbarPosition,

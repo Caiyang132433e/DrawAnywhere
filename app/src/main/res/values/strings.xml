@@ -92,6 +92,8 @@
     <string name="settings_overview">Keep overlay, canvas, and stylus behavior in one tidy place.</string>
     <string name="settings_toolbar_section">Toolbar &amp; canvas</string>
     <string name="settings_toolbar_desc">Choose how the floating pen case docks and how the canvas behaves on launch and hide.</string>
+    <string name="monet_color">Monet colors</string>
+    <string name="monet_color_desc">Use wallpaper-based Material You colors on Android 12+.</string>
     <string name="settings_toolbar_buttons">Toolbar buttons</string>
     <string name="settings_toolbar_buttons_desc">Pick which buttons stay on the first layer. Everything else moves into the expandable second layer; the toolbar grows or shrinks automatically.</string>
     <string name="settings_drawing_section">Drawing input</string>

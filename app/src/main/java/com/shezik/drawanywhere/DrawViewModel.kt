@@ -57,6 +57,7 @@ data class UiState(
     val canvasPassthrough: Boolean = false,
     val autoClearCanvas: Boolean = false,
     val visibleOnStart: Boolean = true,
+    val dynamicColor: Boolean = true,
     val toolbarMinimized: Boolean = false,
     val fingerDrawingEnabled: Boolean = true,
     val stylusButtonScheme: StylusButtonScheme = StylusButtonScheme.XiaomiSmartPen,
@@ -447,6 +448,9 @@ class DrawViewModel(
 
     fun setVisibleOnStart(state: Boolean) =
         _uiState.update { it.copy(visibleOnStart = state) }
+
+    fun setDynamicColor(state: Boolean) =
+        _uiState.update { it.copy(dynamicColor = state) }
 
     fun setToolbarMinimized(state: Boolean) =
         _uiState.update { it.copy(toolbarMinimized = state) }

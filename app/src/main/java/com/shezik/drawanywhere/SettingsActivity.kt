@@ -7,6 +7,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import com.shezik.drawanywhere.ui.theme.DrawAnywhereTheme
 import com.shezik.drawanywhere.view.toolbar.SettingsScreen
@@ -31,7 +33,8 @@ class SettingsActivity : ComponentActivity() {
         setContentView(
             ComposeView(this).apply {
                 setContent {
-                    DrawAnywhereTheme {
+                    val uiState by viewModel.uiState.collectAsState()
+                    DrawAnywhereTheme(dynamicColor = uiState.dynamicColor) {
                         SettingsScreen(
                             viewModel = viewModel,
                             onChooseSaveLocation = {

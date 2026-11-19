@@ -147,6 +147,13 @@ fun SettingsScreen(
                         onCheckedChange = viewModel::setAutoClearCanvas,
                     )
                     HorizontalDivider()
+                    SettingsSwitchRow(
+                        title = stringResource(R.string.monet_color),
+                        subtitle = stringResource(R.string.monet_color_desc),
+                        checked = uiState.dynamicColor,
+                        onCheckedChange = viewModel::setDynamicColor,
+                    )
+                    HorizontalDivider()
                     SaveLocationRow(
                         exportTreeUri = uiState.exportTreeUri,
                         onChooseSaveLocation = onChooseSaveLocation,

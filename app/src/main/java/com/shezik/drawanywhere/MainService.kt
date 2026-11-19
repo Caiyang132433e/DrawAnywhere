@@ -112,7 +112,6 @@ class MainService : Service() {
     private lateinit var windowManager: WindowManager
     private lateinit var canvasView: NativeDrawCanvasView
     private lateinit var toolbarView: ComposeView
-    private lateinit var toolbarDialog: Dialog
     private var settingsView: ComposeView? = null
     private var settingsDialog: Dialog? = null
     private lateinit var dismissTargetView: DismissTargetView
@@ -163,6 +162,7 @@ class MainService : Service() {
         // -------- Setup toolbar (Compose) --------
         toolbarLifecycleOwner.start()
         toolbarView = ComposeView(this).apply {
+            setBackgroundColor(AndroidColor.TRANSPARENT)
             setContent {
                 val canRedo by viewModel.canRedo.collectAsState()
                 val uiState by viewModel.uiState.collectAsState()
@@ -213,7 +213,11 @@ class MainService : Service() {
         // --------------------------------------------------------------------
 
         windowManager.addView(canvasView, canvasParams)
-        showToolbarWindow(toolbarParams)
+        // Add the toolbar directly to WindowManager instead of a Dialog. A Dialog's
+        // decor window clamps/crops its content (rounded corners, shadow and the last
+        // button could be cut off); a direct WRAP_CONTENT overlay measures the whole
+        // Compose toolbar and can be repositioned to keep it on screen.
+        windowManager.addView(toolbarView, toolbarParams)
         windowManager.addView(dismissTargetView, dismissParams)
 
         // Defer toolbar position validation until layout is complete
@@ -294,10 +298,12 @@ class MainService : Service() {
     private fun applyToolbarPosition(params: LayoutParams, state: ServiceState) {
         val rounded = state.toolbarPosition.round()
         val (screenWidth, screenHeight) = getUsableScreenSize(windowManager)
-        val maxX = (screenWidth - toolbarView.width).coerceAtLeast(0)
-        val maxY = (screenHeight - toolbarView.height).coerceAtLeast(0)
-        params.x = rounded.x.coerceIn(0, maxX)
-        params.y = rounded.y.coerceIn(0, maxY)
+        // M3 floating toolbar guidance: keep at least 16dp from the window edges.
+        val margin = dpToPx(16f)
+        val maxX = (screenWidth - toolbarView.width - margin).coerceAtLeast(margin)
+        val maxY = (screenHeight - toolbarView.height - margin).coerceAtLeast(margin)
+        params.x = rounded.x.coerceIn(margin, maxX)
+        params.y = rounded.y.coerceIn(margin, maxY)
         val clamped = Offset(params.x.toFloat(), params.y.toFloat())
         if (clamped != state.toolbarPosition) {
             viewModel.setToolbarPosition(clamped)
@@ -318,46 +324,11 @@ class MainService : Service() {
             .start()
     }
 
-    private fun showToolbarWindow(params: LayoutParams) {
-        toolbarDialog = Dialog(this, R.style.Theme_DrawAnywhere_ToolbarWindow).apply {
-            requestWindowFeature(Window.FEATURE_NO_TITLE)
-            setCanceledOnTouchOutside(false)
-            setContentView(toolbarView)
-            toolbarView.layoutParams = FrameLayout.LayoutParams(
-                LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT
-            )
-        }
-        toolbarDialog.window?.applyToolbarWindowAttributes(params)
-        toolbarDialog.show()
-        toolbarDialog.window?.applyToolbarWindowAttributes(params)
-    }
-
     private fun updateToolbarWindowLayout(params: LayoutParams) {
-        if (::toolbarDialog.isInitialized) {
-            toolbarDialog.window?.applyToolbarWindowAttributes(params)
+        if (::toolbarView.isInitialized && toolbarView.isAttachedToWindow) {
+            windowManager.updateViewLayout(toolbarView, params)
         }
     }
-
-    private fun Window.applyToolbarWindowAttributes(params: LayoutParams) {
-        setBackgroundDrawable(toolbarWindowBackground())
-        clearFlags(LayoutParams.FLAG_DIM_BEHIND or LayoutParams.FLAG_BLUR_BEHIND)
-        setDimAmount(0f)
-        setType(LayoutParams.TYPE_APPLICATION_OVERLAY)
-        decorView.setPadding(0, 0, 0, 0)
-        attributes = params
-        setLayout(params.width, params.height)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            setBackgroundBlurRadius(dpToPx(24f))
-        }
-    }
-
-    private fun toolbarWindowBackground(): GradientDrawable =
-        GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            cornerRadius = dpToPx(20f).toFloat()
-            setColor(AndroidColor.argb(48, 245, 247, 250))
-        }
 
     private fun Window.applySettingsWindowAttributes(params: LayoutParams) {
         setBackgroundDrawable(settingsWindowBackground())
@@ -395,7 +366,8 @@ class MainService : Service() {
 
         val view = ComposeView(this).apply {
             setContent {
-                DrawAnywhereTheme {
+                val settingsUiState by viewModel.uiState.collectAsState()
+                DrawAnywhereTheme(dynamicColor = settingsUiState.dynamicColor) {
                     FloatingSettingsWindow(
                         viewModel = viewModel,
                         onChooseSaveLocation = ::requestSaveLocation,
@@ -779,8 +751,8 @@ class MainService : Service() {
             DrawSessionBridge.viewModel = null
         }
         serviceScope.cancel()
-        if (::toolbarDialog.isInitialized && toolbarDialog.isShowing)
-            toolbarDialog.dismiss()
+        if (::toolbarView.isInitialized && toolbarView.isAttachedToWindow)
+            windowManager.removeView(toolbarView)
         settingsDialog?.dismiss()
         settingsDialog = null
         settingsView = null

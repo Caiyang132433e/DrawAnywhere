@@ -49,6 +49,7 @@ class PreferencesManager(private val context: Context) {
         val TOOLBAR_ORIENTATION_MODE = stringPreferencesKey("toolbar_orientation_mode")
         val AUTO_CLEAR_CANVAS = booleanPreferencesKey("auto_clear_canvas")
         val VISIBLE_ON_START = booleanPreferencesKey("visible_on_start")
+        val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
         val TOOLBAR_MINIMIZED = booleanPreferencesKey("toolbar_minimized")
         val FINGER_DRAWING_ENABLED = booleanPreferencesKey("finger_drawing_enabled")
         val STYLUS_BUTTON_CAPTURE_ENABLED = booleanPreferencesKey("stylus_button_capture_enabled")
@@ -169,6 +170,7 @@ class PreferencesManager(private val context: Context) {
             autoClearCanvas = preferences[PreferencesKeys.AUTO_CLEAR_CANVAS] ?: defaultUiState.autoClearCanvas,
 
             visibleOnStart = visibleOnStart,
+            dynamicColor = preferences[PreferencesKeys.DYNAMIC_COLOR] ?: defaultUiState.dynamicColor,
             toolbarMinimized = toolbarMinimized,
             fingerDrawingEnabled = fingerDrawingEnabled,
             stylusButtonScheme = stylusButtonScheme,
@@ -197,6 +199,7 @@ class PreferencesManager(private val context: Context) {
             preferences[PreferencesKeys.TOOLBAR_ORIENTATION_MODE] = uiState.toolbarOrientationMode.name
             preferences[PreferencesKeys.AUTO_CLEAR_CANVAS] = uiState.autoClearCanvas
             preferences[PreferencesKeys.VISIBLE_ON_START] = uiState.visibleOnStart
+            preferences[PreferencesKeys.DYNAMIC_COLOR] = uiState.dynamicColor
             preferences[PreferencesKeys.TOOLBAR_MINIMIZED] = uiState.toolbarMinimized
             preferences[PreferencesKeys.FINGER_DRAWING_ENABLED] = uiState.fingerDrawingEnabled
             preferences[PreferencesKeys.STYLUS_BUTTON_SCHEME] = uiState.stylusButtonScheme.name
