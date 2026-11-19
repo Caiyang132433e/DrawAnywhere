@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.shezik.drawanywhere.R
 import com.shezik.drawanywhere.model.PRESET_COLORS
 import com.shezik.drawanywhere.ui.theme.Spacing
-import top.yukonga.miuix.kmp.basic.ColorPalette
+import kotlin.math.roundToInt
 
 @Composable
 fun ColorPicker(
@@ -73,13 +74,9 @@ fun ColorPicker(
             }
         }
 
-        ColorPalette(
+        HsvColorPicker(
             color = paletteColor,
             onColorChanged = { paletteColor = it },
-            modifier = Modifier.fillMaxWidth(),
-            rows = 6,
-            hueColumns = 12,
-            showPreview = true,
         )
 
         Button(
@@ -89,6 +86,80 @@ fun ColorPicker(
         ) {
             Text(stringResource(R.string.apply_color))
         }
+    }
+}
+
+/** Material 3 replacement for the Miuix HSV palette: hue / saturation / brightness sliders. */
+@Composable
+fun HsvColorPicker(
+    color: Color,
+    onColorChanged: (Color) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val hsv = remember(color) {
+        FloatArray(3).also { android.graphics.Color.colorToHSV(color.toArgb(), it) }
+    }
+    fun fromHsv(h: Float, s: Float, v: Float): Color =
+        Color(android.graphics.Color.HSVToColor(floatArrayOf(h, s, v)))
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        ColorSlider(
+            label = stringResource(R.string.hue),
+            value = hsv[0],
+            valueRange = 0f..360f,
+            display = { "${it.roundToInt()}°" },
+            onValueChange = { onColorChanged(fromHsv(it, hsv[1], hsv[2])) },
+        )
+        ColorSlider(
+            label = stringResource(R.string.saturation),
+            value = hsv[1],
+            valueRange = 0f..1f,
+            display = { "${(it * 100).roundToInt()}%" },
+            onValueChange = { onColorChanged(fromHsv(hsv[0], it, hsv[2])) },
+        )
+        ColorSlider(
+            label = stringResource(R.string.brightness),
+            value = hsv[2],
+            valueRange = 0f..1f,
+            display = { "${(it * 100).roundToInt()}%" },
+            onValueChange = { onColorChanged(fromHsv(hsv[0], hsv[1], it)) },
+        )
+    }
+}
+
+@Composable
+private fun ColorSlider(
+    label: String,
+    value: Float,
+    valueRange: ClosedFloatingPointRange<Float>,
+    display: (Float) -> String,
+    onValueChange: (Float) -> Unit,
+) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = display(value),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Slider(
+            value = value,
+            onValueChange = onValueChange,
+            valueRange = valueRange,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 

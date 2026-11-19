@@ -53,6 +53,9 @@
     <string name="toolbar_button_visibility">Show / hide canvas</string>
     <string name="toolbar_button_passthrough">Touch passthrough</string>
     <string name="color_picker">Color picker</string>
+    <string name="hue">Hue</string>
+    <string name="saturation">Saturation</string>
+    <string name="brightness">Brightness</string>
     <string name="recent">Recent</string>
     <string name="hsv">HSV</string>
     <string name="apply_color">APPLY</string>

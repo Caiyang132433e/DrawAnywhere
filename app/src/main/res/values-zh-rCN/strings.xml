@@ -54,6 +54,9 @@
     <string name="toolbar_button_visibility">显示/隐藏画布</string>
     <string name="toolbar_button_passthrough">触控穿透</string>
     <string name="color_picker">取色器</string>
+    <string name="hue">色相</string>
+    <string name="saturation">饱和度</string>
+    <string name="brightness">亮度</string>
     <string name="recent">最近</string>
     <string name="hsv">HSV</string>
     <string name="apply_color">应用</string>

@@ -19,6 +19,7 @@ package com.shezik.drawanywhere.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -31,9 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigationevent.NavigationEventDispatcher
 import androidx.navigationevent.OnBackInvokedDefaultInput
 import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
-import top.yukonga.miuix.kmp.theme.ColorSchemeMode
-import top.yukonga.miuix.kmp.theme.MiuixTheme as MiuixRootTheme
-import top.yukonga.miuix.kmp.theme.ThemeController
 
 private val DarkColorScheme = darkColorScheme(
     primary = Blue80,
@@ -77,16 +75,21 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun DrawAnywhereTheme(
-    darkTheme: Boolean = true,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme || dynamicColor) DarkColorScheme else LightColorScheme
-    val miuixController = remember {
-        ThemeController(
-            ColorSchemeMode.System,
-            keyColor = Color(0xFF3482FF),
-        )
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) {
+                androidx.compose.material3.dynamicDarkColorScheme(context)
+            } else {
+                androidx.compose.material3.dynamicLightColorScheme(context)
+            }
+        }
+        darkTheme -> DarkColorScheme
+        else -> LightColorScheme
     }
     val context = LocalContext.current
     val activity = context as? ComponentActivity
@@ -113,12 +116,10 @@ fun DrawAnywhereTheme(
     CompositionLocalProvider(
         LocalNavigationEventDispatcherOwner provides navigationEventDispatcherOwner,
     ) {
-        MiuixRootTheme(controller = miuixController) {
-            MaterialTheme(
-                colorScheme = colorScheme,
-                typography = Typography,
-                content = content
-            )
-        }
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
     }
 }

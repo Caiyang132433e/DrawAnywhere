@@ -1,32 +1,56 @@
+@file:OptIn(
+    androidx.compose.material3.ExperimentalMaterial3Api::class,
+    androidx.compose.foundation.ExperimentalFoundationApi::class,
+)
+
 package com.shezik.drawanywhere.view.toolbar
 
 import android.app.Activity
 import android.net.Uri
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,9 +59,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -51,26 +76,6 @@ import com.shezik.drawanywhere.R
 import com.shezik.drawanywhere.model.PRESET_COLORS
 import com.shezik.drawanywhere.model.StylusButtonAction
 import com.shezik.drawanywhere.model.StylusButtonScheme
-import top.yukonga.miuix.kmp.basic.Button
-import top.yukonga.miuix.kmp.basic.Card
-import top.yukonga.miuix.kmp.basic.CardDefaults
-import top.yukonga.miuix.kmp.basic.ColorPalette
-import top.yukonga.miuix.kmp.basic.HorizontalDivider
-import top.yukonga.miuix.kmp.basic.Icon
-import top.yukonga.miuix.kmp.basic.IconButton
-import top.yukonga.miuix.kmp.basic.Scaffold
-import top.yukonga.miuix.kmp.basic.SmallTitle
-import top.yukonga.miuix.kmp.basic.Text
-import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.blur.layerBackdrop
-import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
-import top.yukonga.miuix.kmp.icon.MiuixIcons
-import top.yukonga.miuix.kmp.icon.extended.Back
-import top.yukonga.miuix.kmp.preference.ArrowPreference
-import top.yukonga.miuix.kmp.preference.OverlayDropdownPreference
-import top.yukonga.miuix.kmp.preference.SwitchPreference
-import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 private val pressureThresholdOptions = listOf(0.65f, 0.75f, 0.85f, 0.95f)
 
@@ -85,173 +90,162 @@ fun SettingsScreen(
     val activity = LocalContext.current as? Activity
     val close: () -> Unit = onClose ?: { activity?.finish() }
 
-    val backdropBackground = MiuixTheme.colorScheme.surface.copy(alpha = 0.56f)
-    val backdrop = rememberLayerBackdrop {
-        drawRect(backdropBackground)
-        drawContent()
-    }
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.surface,
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.settings)) },
+                navigationIcon = {
+                    IconButton(onClick = close) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+            )
+        },
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = paddingValues.calculateTopPadding() + 8.dp,
+                end = 16.dp,
+                bottom = paddingValues.calculateBottomPadding() + 24.dp,
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            item {
+                SettingsSection(title = stringResource(R.string.settings_toolbar_section)) {
+                    SettingsSegmentedRow(
+                        title = stringResource(R.string.toolbar_orientation_mode),
+                        options = listOf(
+                            stringResource(R.string.horizontal),
+                            stringResource(R.string.vertical),
+                        ),
+                        selectedIndex = toolbarOrientationValues.indexOf(uiState.toolbarOrientationMode)
+                            .coerceAtLeast(0),
+                        onSelected = { index ->
+                            viewModel.setToolbarOrientationMode(toolbarOrientationValues[index])
+                        },
+                    )
+                    HorizontalDivider()
+                    SettingsSwitchRow(
+                        title = stringResource(R.string.canvas_visible_on_start),
+                        checked = uiState.visibleOnStart,
+                        onCheckedChange = viewModel::setVisibleOnStart,
+                    )
+                    HorizontalDivider()
+                    SettingsSwitchRow(
+                        title = stringResource(R.string.clear_on_hiding_canvas),
+                        checked = uiState.autoClearCanvas,
+                        onCheckedChange = viewModel::setAutoClearCanvas,
+                    )
+                    HorizontalDivider()
+                    SaveLocationRow(
+                        exportTreeUri = uiState.exportTreeUri,
+                        onChooseSaveLocation = onChooseSaveLocation,
+                        onReset = viewModel::resetExportLocation,
+                    )
+                }
+            }
 
-    CompositionLocalProvider(
-        LocalMiuixBlurBackdrop provides backdrop,
-        LocalMiuixBlurEnabled provides true,
-    ) {
-        Scaffold(
-            modifier = modifier.fillMaxSize(),
-            containerColor = backdropBackground,
-            topBar = {
-                MiuixBlurTopAppBar(
-                    title = stringResource(R.string.settings),
-                    color = MiuixTheme.colorScheme.surface,
-                    navigationIcon = {
-                        IconButton(onClick = close) {
-                            Icon(
-                                imageVector = MiuixIcons.Back,
-                                contentDescription = stringResource(R.string.back),
-                                tint = MiuixTheme.colorScheme.onBackground,
-                            )
-                        }
-                    },
-                )
-            },
-            content = { paddingValues ->
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().layerBackdrop(backdrop),
-                    contentPadding = PaddingValues(
-                        start = 12.dp,
-                        top = paddingValues.calculateTopPadding() + 8.dp,
-                        end = 12.dp,
-                        bottom = paddingValues.calculateBottomPadding() + 20.dp,
-                    ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                item {
-                    PreferenceSection(title = stringResource(R.string.settings_toolbar_section)) {
-                        OverlayDropdownPreference(
-                            title = stringResource(R.string.toolbar_orientation_mode),
-                            items = listOf(
-                                stringResource(R.string.horizontal),
-                                stringResource(R.string.vertical),
-                            ),
-                            selectedIndex = selectedIndexOf(
-                                value = uiState.toolbarOrientationMode,
-                                values = toolbarOrientationValues,
-                            ),
-                            onSelectedIndexChange = { index ->
-                                viewModel.setToolbarOrientationMode(toolbarOrientationValues[index])
+            item {
+                SettingsSection(title = stringResource(R.string.settings_toolbar_buttons)) {
+                    Text(
+                        text = stringResource(R.string.settings_toolbar_buttons_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    )
+                    HorizontalDivider()
+                    ToolbarButtonsSettings(
+                        uiState = uiState,
+                        onToggle = viewModel::setFirstLayerButton,
+                    )
+                }
+            }
+
+            item {
+                SettingsSection(title = stringResource(R.string.settings_drawing_section)) {
+                    SettingsSwitchRow(
+                        title = stringResource(R.string.finger_drawing),
+                        checked = uiState.fingerDrawingEnabled,
+                        onCheckedChange = viewModel::setFingerDrawingEnabled,
+                    )
+                }
+            }
+
+            item {
+                SettingsSection(title = stringResource(R.string.stylus_settings)) {
+                    SettingsDropdownRow(
+                        title = stringResource(R.string.stylus_button_scheme),
+                        items = stylusSchemeLabels(),
+                        selectedIndex = StylusButtonScheme.entries.indexOf(uiState.stylusButtonScheme),
+                        onSelected = { index ->
+                            viewModel.setStylusButtonScheme(StylusButtonScheme.entries[index])
+                        },
+                    )
+                    if (uiState.stylusButtonScheme != StylusButtonScheme.Disabled) {
+                        HorizontalDivider()
+                        SettingsDropdownRow(
+                            title = stringResource(R.string.stylus_primary_button_action),
+                            items = stylusActionLabels(),
+                            selectedIndex = StylusButtonAction.entries.indexOf(uiState.stylusPrimaryButtonAction),
+                            onSelected = { index ->
+                                viewModel.setStylusPrimaryButtonAction(StylusButtonAction.entries[index])
                             },
                         )
                         HorizontalDivider()
-                        SwitchPreference(
-                            title = stringResource(R.string.canvas_visible_on_start),
-                            checked = uiState.visibleOnStart,
-                            onCheckedChange = viewModel::setVisibleOnStart,
-                        )
-                        HorizontalDivider()
-                        SwitchPreference(
-                            title = stringResource(R.string.clear_on_hiding_canvas),
-                            checked = uiState.autoClearCanvas,
-                            onCheckedChange = viewModel::setAutoClearCanvas,
-                        )
-                        HorizontalDivider()
-                        SaveLocationPreference(
-                            exportTreeUri = uiState.exportTreeUri,
-                            onChooseSaveLocation = onChooseSaveLocation,
-                            onReset = viewModel::resetExportLocation,
-                        )
-                    }
-                }
-
-                item {
-                    PreferenceSection(title = stringResource(R.string.settings_drawing_section)) {
-                        SwitchPreference(
-                            title = stringResource(R.string.finger_drawing),
-                            checked = uiState.fingerDrawingEnabled,
-                            onCheckedChange = viewModel::setFingerDrawingEnabled,
-                        )
-                    }
-                }
-
-                item {
-                    PreferenceSection(title = stringResource(R.string.stylus_settings)) {
-                        OverlayDropdownPreference(
-                            title = stringResource(R.string.stylus_button_scheme),
-                            items = stylusSchemeLabels(),
-                            selectedIndex = selectedIndexOf(
-                                value = uiState.stylusButtonScheme,
-                                values = StylusButtonScheme.entries,
-                            ),
-                            onSelectedIndexChange = { index ->
-                                viewModel.setStylusButtonScheme(StylusButtonScheme.entries[index])
+                        SettingsDropdownRow(
+                            title = stringResource(R.string.stylus_secondary_button_action),
+                            items = stylusActionLabels(),
+                            selectedIndex = StylusButtonAction.entries.indexOf(uiState.stylusSecondaryButtonAction),
+                            onSelected = { index ->
+                                viewModel.setStylusSecondaryButtonAction(StylusButtonAction.entries[index])
                             },
                         )
-
-                        if (uiState.stylusButtonScheme != StylusButtonScheme.Disabled) {
-                            HorizontalDivider()
-                            OverlayDropdownPreference(
-                                title = stringResource(R.string.stylus_primary_button_action),
-                                items = stylusActionLabels(),
-                                selectedIndex = selectedIndexOf(
-                                    value = uiState.stylusPrimaryButtonAction,
-                                    values = StylusButtonAction.entries,
-                                ),
-                                onSelectedIndexChange = { index ->
-                                    viewModel.setStylusPrimaryButtonAction(StylusButtonAction.entries[index])
-                                },
-                            )
-                            HorizontalDivider()
-                            OverlayDropdownPreference(
-                                title = stringResource(R.string.stylus_secondary_button_action),
-                                items = stylusActionLabels(),
-                                selectedIndex = selectedIndexOf(
-                                    value = uiState.stylusSecondaryButtonAction,
-                                    values = StylusButtonAction.entries,
-                                ),
-                                onSelectedIndexChange = { index ->
-                                    viewModel.setStylusSecondaryButtonAction(StylusButtonAction.entries[index])
-                                },
-                            )
-                        }
-
+                    }
+                    HorizontalDivider()
+                    SettingsSwitchRow(
+                        title = stringResource(R.string.pressure_eraser),
+                        checked = uiState.pressureEraserEnabled,
+                        onCheckedChange = viewModel::setPressureEraserEnabled,
+                    )
+                    if (uiState.pressureEraserEnabled) {
                         HorizontalDivider()
-                        SwitchPreference(
-                            title = stringResource(R.string.pressure_eraser),
-                            checked = uiState.pressureEraserEnabled,
-                            onCheckedChange = viewModel::setPressureEraserEnabled,
-                        )
-
-                        if (uiState.pressureEraserEnabled) {
-                            HorizontalDivider()
-                            OverlayDropdownPreference(
-                                title = stringResource(R.string.pressure_eraser_threshold),
-                                items = pressureThresholdLabels(),
-                                selectedIndex = selectedIndexOf(
-                                    value = pressureThresholdOption(uiState.pressureEraserThreshold),
-                                    values = pressureThresholdOptions,
-                                ),
-                                onSelectedIndexChange = { index ->
-                                    viewModel.setPressureEraserThreshold(pressureThresholdOptions[index])
-                                },
-                            )
-                        }
-
-                        HorizontalDivider()
-                        StylusCycleColorEditor(
-                            colors = uiState.stylusCycleColors,
-                            onAddColor = viewModel::addStylusCycleColor,
-                            onRemoveColor = viewModel::removeStylusCycleColor,
-                            onReset = viewModel::resetStylusCycleColors,
+                        SettingsDropdownRow(
+                            title = stringResource(R.string.pressure_eraser_threshold),
+                            items = pressureThresholdLabels(),
+                            selectedIndex = pressureThresholdOptions.indexOf(
+                                pressureThresholdOption(uiState.pressureEraserThreshold)
+                            ),
+                            onSelected = { index ->
+                                viewModel.setPressureEraserThreshold(pressureThresholdOptions[index])
+                            },
                         )
                     }
+                    HorizontalDivider()
+                    StylusCycleColorEditor(
+                        colors = uiState.stylusCycleColors,
+                        onAddColor = viewModel::addStylusCycleColor,
+                        onRemoveColor = viewModel::removeStylusCycleColor,
+                        onReset = viewModel::resetStylusCycleColors,
+                    )
                 }
+            }
 
-                item {
-                    PreferenceSection(title = stringResource(R.string.app_name)) {
-                        AboutContent()
-                    }
+            item {
+                SettingsSection(title = stringResource(R.string.settings_app_section)) {
+                    AboutContent()
                 }
-                }
-            },
-        )
+            }
+        }
     }
 }
 
@@ -263,22 +257,22 @@ fun FloatingSettingsWindow(
     modifier: Modifier = Modifier,
 ) {
     val configuration = LocalConfiguration.current
-    val windowWidth = minOf(configuration.screenWidthDp.dp * 0.92f, 520.dp)
-    val windowHeight = minOf(configuration.screenHeightDp.dp * 0.86f, 720.dp)
+    val windowWidth = minOf(configuration.screenWidthDp.dp * 0.92f, 720.dp)
+    val windowHeight = minOf(configuration.screenHeightDp.dp * 0.88f, 900.dp)
 
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        Card(
+        Surface(
             modifier = Modifier
-                .size(width = windowWidth, height = windowHeight)
-                .clip(RoundedCornerShape(24.dp)),
-            cornerRadius = 24.dp,
-            colors = CardDefaults.defaultColors(
-                color = MiuixTheme.colorScheme.surfaceContainer.copy(alpha = 0.18f),
-                contentColor = MiuixTheme.colorScheme.onSurfaceContainer,
-            ),
+                .widthIn(max = windowWidth)
+                .height(windowHeight)
+                .clip(RoundedCornerShape(28.dp)),
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp,
+            shadowElevation = 12.dp,
         ) {
             SettingsScreen(
                 viewModel = viewModel,
@@ -291,52 +285,213 @@ fun FloatingSettingsWindow(
 }
 
 @Composable
-private fun PreferenceSection(
+private fun SettingsSection(
     title: String,
     content: @Composable () -> Unit,
 ) {
-    SmallTitle(text = title)
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.defaultColors(
-            color = MiuixTheme.colorScheme.surfaceContainer.copy(alpha = 0.34f),
-            contentColor = MiuixTheme.colorScheme.onSurfaceContainer,
-        ),
-    ) {
-        content()
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 4.dp),
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            ),
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                content()
+            }
+        }
     }
 }
 
 @Composable
-private fun SaveLocationPreference(
+private fun SettingsSwitchRow(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    subtitle: String? = null,
+    icon: ImageVector? = null,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) }
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(22.dp),
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        Switch(checked = checked, onCheckedChange = null)
+    }
+}
+
+@Composable
+private fun SettingsDropdownRow(
+    title: String,
+    items: List<String>,
+    selectedIndex: Int,
+    onSelected: (Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true }
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = items.getOrElse(selectedIndex) { "" },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            items.forEachIndexed { index, label ->
+                DropdownMenuItem(
+                    text = { Text(label) },
+                    onClick = {
+                        expanded = false
+                        onSelected(index)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsSegmentedRow(
+    title: String,
+    options: List<String>,
+    selectedIndex: Int,
+    onSelected: (Int) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f),
+        )
+        options.forEachIndexed { index, label ->
+            FilterChip(
+                selected = index == selectedIndex,
+                onClick = { onSelected(index) },
+                label = { Text(label) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SaveLocationRow(
     exportTreeUri: String?,
     onChooseSaveLocation: () -> Unit,
     onReset: () -> Unit,
 ) {
-    ArrowPreference(
-        title = stringResource(R.string.save_location),
-        summary = exportTreeUri?.toSaveLocationSummary()
-            ?: stringResource(R.string.save_location_default_summary),
-        onClick = onChooseSaveLocation,
-        bottomAction = {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 14.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TextButton(
-                    text = stringResource(R.string.choose_folder),
-                    onClick = onChooseSaveLocation,
-                    modifier = Modifier.weight(1f),
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onChooseSaveLocation() }
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.save_location),
+                    style = MaterialTheme.typography.bodyLarge,
                 )
-                TextButton(
-                    text = stringResource(R.string.restore_default),
-                    onClick = onReset,
-                    modifier = Modifier.weight(1f),
+                Text(
+                    text = exportTreeUri?.toSaveLocationSummary()
+                        ?: stringResource(R.string.save_location_default_summary),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        },
-    )
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            TextButton(onClick = onChooseSaveLocation, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.choose_folder))
+            }
+            TextButton(onClick = onReset, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.restore_default))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ToolbarButtonsSettings(
+    uiState: com.shezik.drawanywhere.UiState,
+    onToggle: (String, Boolean) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        toolbarButtonCatalog.forEachIndexed { index, meta ->
+            SettingsSwitchRow(
+                title = stringResource(meta.labelRes),
+                checked = meta.id in uiState.firstDrawerButtons,
+                onCheckedChange = { checked -> onToggle(meta.id, checked) },
+                icon = meta.icon,
+            )
+            if (index != toolbarButtonCatalog.lastIndex) {
+                HorizontalDivider(modifier = Modifier.padding(start = 52.dp))
+            }
+        }
+    }
 }
 
 @Composable
@@ -351,18 +506,17 @@ private fun StylusCycleColorEditor(
     val parsedColor = remember(colorInput) { parseColorInput(colorInput) }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text(
             text = stringResource(R.string.stylus_cycle_colors),
-            style = MiuixTheme.textStyles.body1,
-            color = MiuixTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.bodyLarge,
         )
         Text(
             text = stringResource(R.string.stylus_cycle_colors_desc),
-            style = MiuixTheme.textStyles.body2,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             colors.chunked(8).forEach { rowColors ->
@@ -381,37 +535,32 @@ private fun StylusCycleColorEditor(
                 }
             }
         }
-        ColorPalette(
+        HsvColorPicker(
             color = selectedColor,
             onColorChanged = {
                 selectedColor = it.copy(alpha = 1f)
                 colorInput = selectedColor.toHexString(includeAlpha = false)
             },
-            modifier = Modifier.fillMaxWidth(),
-            rows = 4,
-            hueColumns = 10,
-            showPreview = true,
         )
-        TextField(
+        OutlinedTextField(
             value = colorInput,
             onValueChange = {
                 colorInput = it
-                parseColorInput(it)?.let { parsed ->
-                    selectedColor = parsed
-                }
+                parseColorInput(it)?.let { parsed -> selectedColor = parsed }
             },
-            label = stringResource(R.string.color_value_input),
-            useLabelAsPlaceholder = true,
+            label = { Text(stringResource(R.string.color_value_input)) },
             singleLine = true,
+            isError = colorInput.isNotBlank() && parsedColor == null,
+            modifier = Modifier.fillMaxWidth(),
         )
         if (colorInput.isNotBlank() && parsedColor == null) {
             Text(
                 text = stringResource(R.string.color_value_invalid),
-                style = MiuixTheme.textStyles.body2,
-                color = MiuixTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
             )
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = { onAddColor(parsedColor ?: selectedColor.copy(alpha = 1f)) },
                 modifier = Modifier.weight(1f),
@@ -419,16 +568,13 @@ private fun StylusCycleColorEditor(
             ) {
                 Text(stringResource(R.string.add_color))
             }
-            TextButton(
-                text = stringResource(R.string.restore_default),
-                onClick = onReset,
-                modifier = Modifier.weight(1f),
-            )
+            TextButton(onClick = onReset, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.restore_default))
+            }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ColorToken(
     color: Color,
@@ -438,59 +584,72 @@ private fun ColorToken(
 ) {
     Box(
         modifier = Modifier
-            .size(28.dp)
+            .size(30.dp)
             .clip(CircleShape)
             .background(color)
             .border(
                 width = if (selected) 3.dp else 1.dp,
-                color = if (selected) MiuixTheme.colorScheme.primary else MiuixTheme.colorScheme.outline.copy(alpha = 0.42f),
+                color = if (selected) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.outline.copy(alpha = 0.42f)
+                },
                 shape = CircleShape,
             )
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onRemove,
             ),
-    )
+    ) {
+        if (selected) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.onPrimary),
+            )
+        }
+    }
 }
 
 @Composable
 private fun AboutContent() {
-    androidx.compose.foundation.layout.Column(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 20.dp),
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         Image(
             painter = painterResource(id = R.drawable.app_icon),
             contentDescription = stringResource(R.string.app_name),
             modifier = Modifier.size(72.dp),
-            colorFilter = ColorFilter.tint(MiuixTheme.colorScheme.primary),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
         )
         Text(
             text = stringResource(R.string.app_name),
-            style = MiuixTheme.textStyles.title2,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
-            color = MiuixTheme.colorScheme.onBackground,
         )
         Text(
             text = "${BuildConfig.VERSION_NAME}${if (BuildConfig.DEBUG) "-dev" else ""} (${BuildConfig.VERSION_CODE})",
-            style = MiuixTheme.textStyles.body2,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = stringResource(R.string.copyright),
-            style = MiuixTheme.textStyles.body2,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
             text = stringResource(R.string.licenses),
-            style = MiuixTheme.textStyles.body2,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -527,9 +686,6 @@ private val toolbarOrientationValues = listOf(
     ToolbarOrientationMode.HORIZONTAL,
     ToolbarOrientationMode.VERTICAL,
 )
-
-private fun <T> selectedIndexOf(value: T, values: List<T>): Int =
-    values.indexOf(value).takeIf { it >= 0 } ?: 0
 
 private fun pressureThresholdOption(value: Float): Float =
     pressureThresholdOptions.minBy { kotlin.math.abs(it - value) }
